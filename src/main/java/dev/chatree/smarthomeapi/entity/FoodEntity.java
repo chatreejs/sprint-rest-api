@@ -1,28 +1,37 @@
-package com.chatreejs.smarthomeapi.domain;
+package dev.chatree.smarthomeapi.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "food")
-@Getter
-@Setter
-public class Food implements Serializable {
-
+@Data
+@Table(name = "Food")
+public class FoodEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
+    @Column(name = "Name")
     private String name;
+
+    @Column(name = "Quantity")
     private Double quantity;
+
+    @Column(name = "Unit")
     private String unit;
+
+    @Column(name = "BuyDate")
     private Date buyDate;
-    private Date expireDate;
+
+    @Column(name = "ExpiryDate")
+    private Date expiryDate;
+
+    @Column(name = "CreateDate")
     private Date createDate;
+
+    @Column(name = "UpdateDate")
     private Date updateDate;
 
     @PrePersist

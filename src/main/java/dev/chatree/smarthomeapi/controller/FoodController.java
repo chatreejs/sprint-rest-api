@@ -1,9 +1,8 @@
-package com.chatreejs.smarthomeapi.controller;
+package dev.chatree.smarthomeapi.controller;
 
-import com.chatreejs.smarthomeapi.bean.request.FoodRequest;
-import com.chatreejs.smarthomeapi.domain.Food;
-import com.chatreejs.smarthomeapi.service.FoodService;
-import jakarta.validation.Valid;
+import dev.chatree.smarthomeapi.dto.FoodDTO;
+import dev.chatree.smarthomeapi.entity.FoodEntity;
+import dev.chatree.smarthomeapi.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,20 +11,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/foods")
+@RequestMapping("/foods")
 public class FoodController {
 
     @Autowired
     private FoodService foodService;
 
     @GetMapping
-    public ResponseEntity<List<Food>> getAllFood() {
+    public ResponseEntity<List<FoodEntity>> getAllFood() {
         return ResponseEntity.ok(foodService.getAllFood());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Food> getFoodById(@PathVariable Long id) {
-        Food food = foodService.getFoodById(id);
+    public ResponseEntity<Object> getFoodById(@PathVariable Long id) {
+        FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();
         }
@@ -33,14 +32,14 @@ public class FoodController {
     }
 
     @PostMapping
-    public ResponseEntity<Food> createFood(@Valid @RequestBody FoodRequest request) {
+    public ResponseEntity<Object> createFood(@RequestBody FoodDTO request) {
         foodService.createFood(request);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Food> updateFood(@PathVariable Long id, @Valid @RequestBody FoodRequest request) {
-        Food food = foodService.getFoodById(id);
+    public ResponseEntity<Object> updateFood(@PathVariable Long id,@RequestBody FoodDTO request) {
+        FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();
         }
@@ -49,8 +48,8 @@ public class FoodController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Food> deleteFood(@PathVariable Long id) {
-        Food food = foodService.getFoodById(id);
+    public ResponseEntity<Object> deleteFood(@PathVariable Long id) {
+        FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();
         }
@@ -59,10 +58,10 @@ public class FoodController {
     }
 
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<Food> deleteMultipleFood(String ids) {
+    public ResponseEntity<Object> deleteMultipleFood(String ids) {
         String[] idList = ids.split(",");
         for (String id : idList) {
-            Food food = foodService.getFoodById(Long.parseLong(id));
+            FoodEntity food = foodService.getFoodById(Long.parseLong(id));
             if (food == null) {
                 return ResponseEntity.notFound().build();
             }
