@@ -3,7 +3,6 @@ package dev.chatree.smarthomeapi.service;
 import dev.chatree.smarthomeapi.dto.FoodDTO;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.repository.FoodRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,8 +12,11 @@ import java.util.List;
 @Service
 public class FoodService {
 
-    @Autowired
-    private FoodRepository foodRepository;
+    private final FoodRepository foodRepository;
+
+    public FoodService(FoodRepository foodRepository) {
+        this.foodRepository = foodRepository;
+    }
 
     public List<FoodEntity> getAllFood() {
         return foodRepository.findAll();
