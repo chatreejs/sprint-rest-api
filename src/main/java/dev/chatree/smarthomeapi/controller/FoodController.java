@@ -40,7 +40,7 @@ public class FoodController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateFood(@PathVariable Long id,@RequestBody FoodDTO request) {
+    public ResponseEntity<Object> updateFood(@PathVariable Long id, @RequestBody FoodDTO request) {
         FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();
