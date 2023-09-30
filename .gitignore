@@ -13,7 +13,6 @@ build/
 .settings
 .springBeans
 .sts4-cache
-bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
@@ -39,6 +38,8 @@ out/
 *.env
 !example.env
 
-### OS ###
+### Platform Engineer ###
+logs
+
+### Mac ###
 .DS_Store
-Thumbs.db

@@ -16,3 +16,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+logs:
+  path: /app/logs/resource
+  queue-size: 100000

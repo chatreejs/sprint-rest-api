@@ -3,12 +3,15 @@ package dev.chatree.smarthomeapi.controller;
 import dev.chatree.smarthomeapi.dto.FoodDTO;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.service.FoodService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Log4j2
 @RestController
 @RequestMapping("/foods")
 public class FoodController {
@@ -20,12 +23,14 @@ public class FoodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodEntity>> getAllFood() {
+    public ResponseEntity<List<FoodEntity>> getAllFood(HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
         return ResponseEntity.ok(foodService.getAllFood());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getFoodById(@PathVariable Long id) {
+    public ResponseEntity<Object> getFoodById(@PathVariable Long id, HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
         FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();
