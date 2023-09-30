@@ -39,25 +39,28 @@ public class FoodController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createFood(@RequestBody Food request) {
-        foodService.createFood(request);
+    public ResponseEntity<Object> createFood(@RequestBody Food food, HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
+        foodService.createFood(food);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateFood(@PathVariable Long id, @RequestBody Food request) {
-        FoodEntity food = foodService.getFoodById(id);
-        if (food == null) {
+    public ResponseEntity<Object> updateFood(@PathVariable Long id, @RequestBody Food food, HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
+        FoodEntity foodEntity = foodService.getFoodById(id);
+        if (foodEntity == null) {
             return ResponseEntity.notFound().build();
         }
-        foodService.updateFood(id, request);
+        foodService.updateFood(id, food);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteFood(@PathVariable Long id) {
-        FoodEntity food = foodService.getFoodById(id);
-        if (food == null) {
+    public ResponseEntity<Object> deleteFood(@PathVariable Long id, HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
+        FoodEntity foodEntity = foodService.getFoodById(id);
+        if (foodEntity == null) {
             return ResponseEntity.notFound().build();
         }
         foodService.deleteFood(id);
@@ -65,11 +68,12 @@ public class FoodController {
     }
 
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<Object> deleteMultipleFood(String ids) {
+    public ResponseEntity<Object> deleteMultipleFood(String ids, HttpServletRequest request) {
+        log.info("API {}: {}", request.getMethod(), request.getServletPath());
         String[] idList = ids.split(",");
         for (String id : idList) {
-            FoodEntity food = foodService.getFoodById(Long.parseLong(id));
-            if (food == null) {
+            FoodEntity foodEntity = foodService.getFoodById(Long.parseLong(id));
+            if (foodEntity == null) {
                 return ResponseEntity.notFound().build();
             }
             foodService.deleteFood(Long.parseLong(id));
