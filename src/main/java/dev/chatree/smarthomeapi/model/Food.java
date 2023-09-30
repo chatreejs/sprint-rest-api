@@ -1,4 +1,4 @@
-package dev.chatree.smarthomeapi.dto;
+package dev.chatree.smarthomeapi.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class FoodDTO {
+public class Food {
     private String name;
 
     private Double quantity;

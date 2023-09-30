@@ -1,6 +1,6 @@
 package dev.chatree.smarthomeapi.controller;
 
-import dev.chatree.smarthomeapi.dto.FoodDTO;
+import dev.chatree.smarthomeapi.model.Food;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.service.FoodService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,13 +39,13 @@ public class FoodController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createFood(@RequestBody FoodDTO request) {
+    public ResponseEntity<Object> createFood(@RequestBody Food request) {
         foodService.createFood(request);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateFood(@PathVariable Long id, @RequestBody FoodDTO request) {
+    public ResponseEntity<Object> updateFood(@PathVariable Long id, @RequestBody Food request) {
         FoodEntity food = foodService.getFoodById(id);
         if (food == null) {
             return ResponseEntity.notFound().build();

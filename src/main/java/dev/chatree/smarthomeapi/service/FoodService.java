@@ -1,6 +1,6 @@
 package dev.chatree.smarthomeapi.service;
 
-import dev.chatree.smarthomeapi.dto.FoodDTO;
+import dev.chatree.smarthomeapi.model.Food;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.repository.FoodRepository;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class FoodService {
         return foodRepository.findById(id).orElse(null);
     }
 
-    public void createFood(FoodDTO foodDTO) {
+    public void createFood(Food foodDTO) {
         FoodEntity food = new FoodEntity();
         food.setName(foodDTO.getName());
         food.setQuantity(foodDTO.getQuantity());
@@ -37,7 +37,7 @@ public class FoodService {
         foodRepository.save(food);
     }
 
-    public void updateFood(Long id, FoodDTO foodDTO) {
+    public void updateFood(Long id, Food foodDTO) {
         FoodEntity food = foodRepository.findById(id).orElse(null);
         if (food == null) {
             throw new ResponseStatusException(
