@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -70,14 +71,9 @@ public class FoodController {
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<Object> deleteMultipleFood(String ids, HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        String[] idList = ids.split(",");
-        for (String id : idList) {
-            FoodEntity foodEntity = foodService.getFoodById(Long.parseLong(id));
-            if (foodEntity == null) {
-                return ResponseEntity.notFound().build();
-            }
-            foodService.deleteFood(Long.parseLong(id));
-        }
+        List<String> idStrList = List.of(ids.split(","));
+        List<Long> idList = idStrList.stream().map(Long::parseLong).toList();
+        foodService.deleteMultipleFood(idList);
         return ResponseEntity.noContent().build();
     }
 }
