@@ -1,11 +1,12 @@
 package dev.chatree.smarthomeapi.service;
 
-import dev.chatree.smarthomeapi.model.Food;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
+import dev.chatree.smarthomeapi.model.FoodDTO;
 import dev.chatree.smarthomeapi.repository.FoodRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -21,56 +22,57 @@ public class FoodService {
     }
 
     public List<FoodEntity> getAllFood() {
-        log.info("Get all food");
-        return foodRepository.findAll();
+        List<FoodEntity> foodEntityList = foodRepository.findAll();
+        log.info("Found {} items", foodEntityList.size());
+        log.info("Get all food done!");
+        return foodEntityList;
     }
 
     public FoodEntity getFoodById(Long id) {
         log.info("id: {}", id);
         FoodEntity food = foodRepository.findById(id).orElse(null);
+        if (food == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
+        }
         log.info("getFoodById done!");
-        return foodRepository.findById(id).orElse(null);
+        return food;
     }
 
-    public void createFood(Food foodDTO) {
-        FoodEntity food = new FoodEntity();
-        food.setName(foodDTO.getName());
-        food.setQuantity(foodDTO.getQuantity());
-        food.setUnit(foodDTO.getUnit());
-        food.setBuyDate(foodDTO.getBuyDate());
-        food.setExpiryDate(foodDTO.getExpiryDate());
+    public void createFood(FoodDTO foodDTO) {
+        FoodEntity foodEntity = new FoodEntity();
+        foodEntity.setName(foodDTO.getName());
+        foodEntity.setQuantity(foodDTO.getQuantity());
+        foodEntity.setUnit(foodDTO.getUnit());
+        foodEntity.setBuyDate(foodDTO.getBuyDate());
+        foodEntity.setExpiryDate(foodDTO.getExpiryDate());
 
-        foodRepository.save(food);
+        foodRepository.save(foodEntity);
         log.info("createFood done!");
     }
 
-    public void updateFood(Long id, Food foodDTO) {
+    public void updateFood(Long id, FoodDTO foodDTO) {
         log.info("id: {}", id);
-        FoodEntity food = foodRepository.findById(id).orElse(null);
-        if (food == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Food not found"
-            );
+        FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
+        if (foodEntity == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
-        food.setName(foodDTO.getName());
-        food.setQuantity(foodDTO.getQuantity());
-        food.setUnit(foodDTO.getUnit());
-        food.setBuyDate(foodDTO.getBuyDate());
-        food.setExpiryDate(foodDTO.getExpiryDate());
+        foodEntity.setName(foodDTO.getName());
+        foodEntity.setQuantity(foodDTO.getQuantity());
+        foodEntity.setUnit(foodDTO.getUnit());
+        foodEntity.setBuyDate(foodDTO.getBuyDate());
+        foodEntity.setExpiryDate(foodDTO.getExpiryDate());
 
-        foodRepository.save(food);
+        foodRepository.save(foodEntity);
         log.info("updateFood done!");
     }
 
     public void deleteFood(Long id) {
         log.info("id: {}", id);
-        FoodEntity food = foodRepository.findById(id).orElse(null);
-        if (food == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Food not found"
-            );
+        FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
+        if (foodEntity == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
-        foodRepository.delete(food);
+        foodRepository.delete(foodEntity);
         log.info("deleteFood done!");
     }
 
@@ -79,5 +81,4 @@ public class FoodService {
         foodRepository.deleteAllById(ids);
         log.info("deleteMultipleFood done!");
     }
-
 }
