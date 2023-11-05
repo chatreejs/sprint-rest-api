@@ -2,7 +2,8 @@ package dev.chatree.smarthomeapi.controller;
 
 import dev.chatree.smarthomeapi.entity.InventoryEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
-import dev.chatree.smarthomeapi.model.InventoryDTO;
+import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
+import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
 import dev.chatree.smarthomeapi.service.InventoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -26,7 +27,7 @@ public class InventoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<InventoryEntity>> getAllInventory(HttpServletRequest request) {
+    public ResponseEntity<List<InventoryResponse>> getAllInventory(HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         return ResponseEntity.ok(inventoryService.getAllInventory());
     }
@@ -36,8 +37,8 @@ public class InventoryController {
                                                    HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            InventoryEntity inventory = inventoryService.getInventoryById(id);
-            return ResponseEntity.ok(inventory);
+            InventoryResponse inventoryResponse = inventoryService.getInventoryById(id);
+            return ResponseEntity.ok(inventoryResponse);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
@@ -45,7 +46,7 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createInventory(@RequestBody InventoryDTO inventory,
+    public ResponseEntity<Object> createInventory(@RequestBody InventoryRequest inventory,
                                                   HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         inventoryService.createInventory(inventory);
@@ -54,7 +55,7 @@ public class InventoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateInventory(@PathVariable Long id,
-                                                  @RequestBody InventoryDTO inventory,
+                                                  @RequestBody InventoryRequest inventory,
                                                   HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {

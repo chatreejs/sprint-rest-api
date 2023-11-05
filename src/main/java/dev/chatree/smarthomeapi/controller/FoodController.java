@@ -2,7 +2,8 @@ package dev.chatree.smarthomeapi.controller;
 
 import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
-import dev.chatree.smarthomeapi.model.FoodDTO;
+import dev.chatree.smarthomeapi.model.food.FoodRequest;
+import dev.chatree.smarthomeapi.model.food.FoodResponse;
 import dev.chatree.smarthomeapi.service.FoodService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -26,7 +27,7 @@ public class FoodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodEntity>> getAllFood(HttpServletRequest request) {
+    public ResponseEntity<List<FoodResponse>> getAllFood(HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         return ResponseEntity.ok(foodService.getAllFood());
     }
@@ -36,8 +37,9 @@ public class FoodController {
                                               HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            FoodEntity food = foodService.getFoodById(id);
-            return ResponseEntity.ok(food);
+            FoodResponse foodResponse = foodService.getFoodById(id);
+            log.info("{}", foodResponse);
+            return ResponseEntity.ok(foodResponse);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
@@ -45,20 +47,20 @@ public class FoodController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createFood(@RequestBody FoodDTO food,
+    public ResponseEntity<Object> createFood(@RequestBody FoodRequest foodRequest,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        foodService.createFood(food);
+        foodService.createFood(foodRequest);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateFood(@PathVariable Long id,
-                                             @RequestBody FoodDTO food,
+                                             @RequestBody FoodRequest foodRequest,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            foodService.updateFood(id, food);
+            foodService.updateFood(id, foodRequest);
             return ResponseEntity.ok().build();
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
