@@ -16,5 +16,5 @@ public class WarrantyResponse {
     private String serialNumber;
     private String purchaseDate;
     private String warrantyDate;
-    private WarrantyStatus warrantyStatus;
+    private WarrantyStatus status;
 }

@@ -110,7 +110,7 @@ public class WarrantyService {
         warrantyResponse.setSerialNumber(warrantyEntity.getSerialNumber());
         warrantyResponse.setPurchaseDate(warrantyEntity.getPurchaseDate().toString());
         warrantyResponse.setWarrantyDate(warrantyEntity.getWarrantyDate().toString());
-        warrantyResponse.setWarrantyStatus(generateWarrantyStatus(warrantyEntity.getWarrantyDate()));
+        warrantyResponse.setStatus(generateWarrantyStatus(warrantyEntity.getWarrantyDate()));
 
         return warrantyResponse;
     }
