@@ -3,6 +3,7 @@ package dev.chatree.smarthomeapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -23,10 +24,10 @@ public class FoodEntity {
     private String unit;
 
     @Column(name = "BuyDate")
-    private Date buyDate;
+    private LocalDate buyDate;
 
     @Column(name = "ExpiryDate")
-    private Date expiryDate;
+    private LocalDate expiryDate;
 
     @Column(name = "CreateDate")
     private Date createDate;

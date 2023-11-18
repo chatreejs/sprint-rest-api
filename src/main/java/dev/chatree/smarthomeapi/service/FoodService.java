@@ -10,8 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Log4j2
@@ -55,8 +56,8 @@ public class FoodService {
         foodEntity.setName(foodRequest.getName());
         foodEntity.setQuantity(foodRequest.getQuantity());
         foodEntity.setUnit(foodRequest.getUnit());
-        foodEntity.setBuyDate(foodRequest.getBuyDate());
-        foodEntity.setExpiryDate(foodRequest.getExpiryDate());
+        foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
+        foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
 
         foodRepository.save(foodEntity);
         log.info("createFood done!");
@@ -71,8 +72,8 @@ public class FoodService {
         foodEntity.setName(foodRequest.getName());
         foodEntity.setQuantity(foodRequest.getQuantity());
         foodEntity.setUnit(foodRequest.getUnit());
-        foodEntity.setBuyDate(foodRequest.getBuyDate());
-        foodEntity.setExpiryDate(foodRequest.getExpiryDate());
+        foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
+        foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
 
         foodRepository.save(foodEntity);
         log.info("updateFood done!");
@@ -107,8 +108,8 @@ public class FoodService {
         return foodResponse;
     }
 
-    private FoodStatus checkFoodStatus(Date expiryDate) {
-        if (expiryDate.before(new Date())) {
+    private FoodStatus checkFoodStatus(LocalDate expiryDate) {
+        if (expiryDate.isBefore(LocalDate.now())) {
             return FoodStatus.EXPIRED;
         } else {
             return FoodStatus.FRESH;
