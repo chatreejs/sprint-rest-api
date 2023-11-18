@@ -1,6 +1,5 @@
 package dev.chatree.smarthomeapi.controller;
 
-import dev.chatree.smarthomeapi.entity.FoodEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
 import dev.chatree.smarthomeapi.model.food.FoodRequest;
 import dev.chatree.smarthomeapi.model.food.FoodResponse;
@@ -33,8 +32,8 @@ public class FoodController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getFoodById(@PathVariable Long id,
-                                              HttpServletRequest request) {
+    public ResponseEntity<?> getFoodById(@PathVariable Long id,
+                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             FoodResponse foodResponse = foodService.getFoodById(id);
@@ -47,17 +46,17 @@ public class FoodController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createFood(@RequestBody FoodRequest foodRequest,
-                                             HttpServletRequest request) {
+    public ResponseEntity<?> createFood(@RequestBody FoodRequest foodRequest,
+                                        HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         foodService.createFood(foodRequest);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateFood(@PathVariable Long id,
-                                             @RequestBody FoodRequest foodRequest,
-                                             HttpServletRequest request) {
+    public ResponseEntity<?> updateFood(@PathVariable Long id,
+                                        @RequestBody FoodRequest foodRequest,
+                                        HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             foodService.updateFood(id, foodRequest);
@@ -69,8 +68,8 @@ public class FoodController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteFood(@PathVariable Long id,
-                                             HttpServletRequest request) {
+    public ResponseEntity<?> deleteFood(@PathVariable Long id,
+                                        HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             foodService.deleteFood(id);
@@ -82,8 +81,8 @@ public class FoodController {
     }
 
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<Object> deleteMultipleFood(String ids,
-                                                     HttpServletRequest request) {
+    public ResponseEntity<?> deleteMultipleFood(String ids,
+                                                HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         if (ids.isBlank()) {
             log.info("Error: ids must not be blank");

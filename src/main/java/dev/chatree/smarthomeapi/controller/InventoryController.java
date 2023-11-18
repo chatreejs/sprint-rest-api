@@ -1,6 +1,5 @@
 package dev.chatree.smarthomeapi.controller;
 
-import dev.chatree.smarthomeapi.entity.InventoryEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
 import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
 import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
@@ -33,8 +32,8 @@ public class InventoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getInventoryById(@PathVariable Long id,
-                                                   HttpServletRequest request) {
+    public ResponseEntity<?> getInventoryById(@PathVariable Long id,
+                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             InventoryResponse inventoryResponse = inventoryService.getInventoryById(id);
@@ -46,17 +45,17 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createInventory(@RequestBody InventoryRequest inventory,
-                                                  HttpServletRequest request) {
+    public ResponseEntity<?> createInventory(@RequestBody InventoryRequest inventory,
+                                             HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         inventoryService.createInventory(inventory);
         return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateInventory(@PathVariable Long id,
-                                                  @RequestBody InventoryRequest inventory,
-                                                  HttpServletRequest request) {
+    public ResponseEntity<?> updateInventory(@PathVariable Long id,
+                                             @RequestBody InventoryRequest inventory,
+                                             HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             inventoryService.updateInventory(id, inventory);
@@ -68,8 +67,8 @@ public class InventoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteInventory(@PathVariable Long id,
-                                                  HttpServletRequest request) {
+    public ResponseEntity<?> deleteInventory(@PathVariable Long id,
+                                             HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
             inventoryService.deleteInventory(id);
