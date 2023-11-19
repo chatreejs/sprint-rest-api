@@ -8,7 +8,7 @@
             %style{${TIMESTAMP_PATTERN}}{black} %highlight{%-5level} [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable{full}</Property>
         <Property name="APP_LOG_ROOT">logs</Property>
         <Property name="APP_BACKUP_DIR">${APP_LOG_ROOT}/backup</Property>
-        <Property name="APP_LOG_NAME">sur-ana-api</Property>
+        <Property name="APP_LOG_NAME">smarthome-api</Property>
     </Properties>
 
     <Appenders>
