@@ -86,6 +86,9 @@ public class ConsumerService extends AbstractConsumerSeekAware {
         if (sensorUpdate.getType().equals("pressure")) {
             weatherSensorResponse.setPressure(sensorUpdate.getValue());
         }
+        if (sensorUpdate.getType().equals("pm25")) {
+            weatherSensorResponse.setPm25(sensorUpdate.getValue().intValue());
+        }
         return weatherSensorResponse;
     }
 }

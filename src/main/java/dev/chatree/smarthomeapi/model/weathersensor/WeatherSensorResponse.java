@@ -14,4 +14,5 @@ public class WeatherSensorResponse {
     private Double temperature;
     private Double humidity;
     private Double pressure;
+    private Integer pm25;
 }
