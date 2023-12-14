@@ -62,7 +62,7 @@ public class ConsumerService extends AbstractConsumerSeekAware {
             if (type.equals("SensorUpdate")) {
                 try {
                     SensorUpdate sensorUpdate = gson.fromJson(value, SensorUpdate.class);
-                    WeatherSensorResponse weatherSensorResponse = weatherSensorReponseWrapper(offsetDateTime, sensorUpdate);
+                    WeatherSensorResponse weatherSensorResponse = weatherSensorResponseWrapper(offsetDateTime, sensorUpdate);
                     weatherSensorResponseCache = weatherSensorResponse;
 
                     simpMessagingTemplate.convertAndSend("/topic/weather-sensor", weatherSensorResponse);
@@ -73,7 +73,7 @@ public class ConsumerService extends AbstractConsumerSeekAware {
         }
     }
 
-    private WeatherSensorResponse weatherSensorReponseWrapper(OffsetDateTime offsetDateTime, SensorUpdate sensorUpdate) {
+    private WeatherSensorResponse weatherSensorResponseWrapper(OffsetDateTime offsetDateTime, SensorUpdate sensorUpdate) {
         WeatherSensorResponse weatherSensorResponse = weatherSensorResponseCache;
         weatherSensorResponse.setTimestamp(offsetDateTime.toString());
 
