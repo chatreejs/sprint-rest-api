@@ -52,6 +52,6 @@
             <AppenderRef ref="CriticalFile" level="error" />
         </Root>
 
-        <Logger name="th.or.set.trading" level="${env:APP_LOG_LEVEL:-trace}" />
+        <Logger name="dev.chatree" level="${env:APP_LOG_LEVEL:-trace}" />
     </Loggers>
 </Configuration>

@@ -26,7 +26,7 @@ kafka:
     group-id-prefix: ${API_KAFKA_CONSUMER_GROUP_ID_PREFIX}
     client-id: ${API_KAFKA_CONSUMER_CLIENT_ID}
     client-rack: ${API_KAFKA_CONSUMER_CLIENT_RACK}
-    auto-offset-reset: earliest
+    auto-offset-reset: latest
     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   in:
