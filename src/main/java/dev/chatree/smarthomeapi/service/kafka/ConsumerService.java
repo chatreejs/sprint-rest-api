@@ -55,40 +55,28 @@ public class ConsumerService extends AbstractConsumerSeekAware {
                 offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
                 log.info("timestamp = {}", offsetDateTime);
                 log.info("value = {}", value);
-            } else {
-                return;
-            }
 
-            if (type.equals("SensorUpdate")) {
                 try {
                     SensorUpdate sensorUpdate = gson.fromJson(value, SensorUpdate.class);
-                    WeatherSensorResponse weatherSensorResponse = weatherSensorResponseWrapper(offsetDateTime, sensorUpdate);
-                    weatherSensorResponseCache = weatherSensorResponse;
+                    weatherSensorResponseCache.setTimestamp(offsetDateTime.toString());
+                    if (sensorUpdate.getType().equals("temperature")) {
+                        weatherSensorResponseCache.setTemperature(sensorUpdate.getValue());
+                    }
+                    if (sensorUpdate.getType().equals("humidity")) {
+                        weatherSensorResponseCache.setHumidity(sensorUpdate.getValue());
+                    }
+                    if (sensorUpdate.getType().equals("pressure")) {
+                        weatherSensorResponseCache.setPressure(sensorUpdate.getValue());
+                    }
+                    if (sensorUpdate.getType().equals("pm25")) {
+                        weatherSensorResponseCache.setPm25(sensorUpdate.getValue().intValue());
+                    }
 
-                    simpMessagingTemplate.convertAndSend("/topic/weather-sensor", weatherSensorResponse);
+                    simpMessagingTemplate.convertAndSend("/topic/weather-sensor", weatherSensorResponseCache);
                 } catch (Exception e) {
                     log.error("Consume SensorUpdate error: ", e);
                 }
             }
         }
-    }
-
-    private WeatherSensorResponse weatherSensorResponseWrapper(OffsetDateTime offsetDateTime, SensorUpdate sensorUpdate) {
-        WeatherSensorResponse weatherSensorResponse = weatherSensorResponseCache;
-        weatherSensorResponse.setTimestamp(offsetDateTime.toString());
-
-        if (sensorUpdate.getType().equals("temperature")) {
-            weatherSensorResponse.setTemperature(sensorUpdate.getValue());
-        }
-        if (sensorUpdate.getType().equals("humidity")) {
-            weatherSensorResponse.setHumidity(sensorUpdate.getValue());
-        }
-        if (sensorUpdate.getType().equals("pressure")) {
-            weatherSensorResponse.setPressure(sensorUpdate.getValue());
-        }
-        if (sensorUpdate.getType().equals("pm25")) {
-            weatherSensorResponse.setPm25(sensorUpdate.getValue().intValue());
-        }
-        return weatherSensorResponse;
     }
 }
