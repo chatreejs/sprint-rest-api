@@ -34,15 +34,6 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Web Socket
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
-	// Kafka
-	implementation 'org.springframework.kafka:spring-kafka'
-
-	// Gson
-	implementation 'com.google.code.gson:gson'
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
