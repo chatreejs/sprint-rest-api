@@ -26,7 +26,7 @@ public class FoodService {
     }
 
     public List<FoodResponse> getAllFood() {
-        List<FoodEntity> foodEntityList = foodRepository.findAll();
+        List<FoodEntity> foodEntityList = foodRepository.findAllByOrderByExpiryDateAsc();
         log.info("Found {} items", foodEntityList.size());
         List<FoodResponse> foodResponseList = new ArrayList<>();
 

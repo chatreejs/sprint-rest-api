@@ -26,7 +26,7 @@ public class WarrantyService {
     }
 
     public List<WarrantyResponse> getAllWarranty() {
-        List<WarrantyEntity> warrantyEntityList = warrantyRepository.findAll();
+        List<WarrantyEntity> warrantyEntityList = warrantyRepository.findAllByOrderByWarrantyDateAsc();
         log.info("Found {} items", warrantyEntityList.size());
         List<WarrantyResponse> warrantyResponseList = new ArrayList<>();
 

@@ -24,7 +24,17 @@ public class InventoryService {
     }
 
     public List<InventoryResponse> getAllInventory() {
-        List<InventoryEntity> inventoryEntityList = inventoryRepository.findAll();
+        List<InventoryEntity> inventoryEntityList = inventoryRepository.findAllByOrderByQuantityAsc();
+        inventoryEntityList.sort((o1, o2) -> {
+            if (o1.getQuantity() <= (o1.getMaxQuantity() * 0.3)) {
+                return -1;
+            } else if (o2.getQuantity() <= (o2.getMaxQuantity() * 0.3)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
         log.info("Found {} items", inventoryEntityList.size());
         List<InventoryResponse> inventoryResponseList = new ArrayList<>();
 
