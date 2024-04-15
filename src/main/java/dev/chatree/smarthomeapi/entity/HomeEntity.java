@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Inventory")
-public class InventoryEntity {
+@Table(name = "Home")
+public class HomeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -16,27 +18,29 @@ public class InventoryEntity {
     @Column(name = "Name")
     private String name;
 
-    @Column(name = "Brand")
-    private String brand;
+    @Column(name = "Address")
+    private String address;
 
-    @Column(name = "Quantity")
-    private Double quantity;
+    @Column(name = "Latitude")
+    private Double latitude;
 
-    @Column(name = "MaxQuantity")
-    private Double maxQuantity;
+    @Column(name = "Longitude")
+    private Double longitude;
 
-    @Column(name = "Unit")
-    private String unit;
+    @Column(name = "Owner")
+    private Long owner;
+
+    @ManyToMany(mappedBy = "homes")
+    private Set<AccountEntity> accounts;
+
+    @OneToMany(mappedBy = "home")
+    private List<FoodEntity> foods;
 
     @Column(name = "CreateDate")
     private Date createDate;
 
     @Column(name = "UpdateDate")
     private Date updateDate;
-
-    @ManyToOne
-    @JoinColumn(name = "HomeId")
-    private HomeEntity home;
 
     @PrePersist
     public void prePersist() {

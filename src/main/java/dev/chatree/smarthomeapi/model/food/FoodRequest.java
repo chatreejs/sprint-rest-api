@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FoodRequest {
     private String name;
+    private String brand;
     private Double quantity;
     private String unit;
     private String buyDate;

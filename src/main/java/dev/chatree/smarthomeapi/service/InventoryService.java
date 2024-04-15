@@ -1,5 +1,6 @@
 package dev.chatree.smarthomeapi.service;
 
+import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.entity.InventoryEntity;
 import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
 import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
@@ -23,7 +24,7 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
     }
 
-    public List<InventoryResponse> getAllInventory() {
+    public List<InventoryResponse> getAllInventory(Long homeId, AccountEntity account) {
         List<InventoryEntity> inventoryEntityList = inventoryRepository.findAllByOrderByQuantityAsc();
         inventoryEntityList.sort((o1, o2) -> {
             if (o1.getQuantity() <= (o1.getMaxQuantity() * 0.3)) {
@@ -35,7 +36,6 @@ public class InventoryService {
             }
         });
 
-        log.info("Found {} items", inventoryEntityList.size());
         List<InventoryResponse> inventoryResponseList = new ArrayList<>();
 
         for (InventoryEntity inventoryEntity : inventoryEntityList) {
@@ -47,7 +47,6 @@ public class InventoryService {
     }
 
     public InventoryResponse getInventoryById(Long id) {
-        log.info("id: {}", id);
         InventoryEntity inventoryEntity = inventoryRepository.findById(id).orElse(null);
         if (inventoryEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
@@ -55,7 +54,7 @@ public class InventoryService {
 
         InventoryResponse inventoryResponse = generateInventoryResponse(inventoryEntity);
 
-        log.info("getInventoryById done!");
+        log.info("Get inventory by id done!");
         return inventoryResponse;
     }
 
@@ -67,11 +66,10 @@ public class InventoryService {
         inventoryEntity.setUnit(inventoryRequest.getUnit());
 
         inventoryRepository.save(inventoryEntity);
-        log.info("createInventory done!");
+        log.info("Create inventory done!");
     }
 
     public void updateInventory(Long id, InventoryRequest inventoryRequest) {
-        log.info("id: {}", id);
         InventoryEntity inventoryEntity = inventoryRepository.findById(id).orElse(null);
         if (inventoryEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
@@ -82,7 +80,7 @@ public class InventoryService {
         inventoryEntity.setUnit(inventoryRequest.getUnit());
 
         inventoryRepository.save(inventoryEntity);
-        log.info("updateInventory done!");
+        log.info("Update inventory done!");
     }
 
     public void deleteInventory(Long id) {
@@ -92,13 +90,13 @@ public class InventoryService {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
         }
         inventoryRepository.deleteById(id);
-        log.info("deleteInventory done!");
+        log.info("Delete inventory done!");
     }
 
     public void deleteMultipleInventory(List<Long> ids) {
         log.info("ids: {}", ids);
         inventoryRepository.deleteAllById(ids);
-        log.info("deleteMultipleInventory done!");
+        log.info("Delete multiple inventory done!");
     }
 
     private InventoryResponse generateInventoryResponse(InventoryEntity inventoryEntity) {

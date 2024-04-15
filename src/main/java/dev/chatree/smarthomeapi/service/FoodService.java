@@ -1,10 +1,15 @@
 package dev.chatree.smarthomeapi.service;
 
+import dev.chatree.smarthomeapi.constant.ErrorMessage;
+import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
+import dev.chatree.smarthomeapi.entity.HomeEntity;
 import dev.chatree.smarthomeapi.model.food.FoodRequest;
 import dev.chatree.smarthomeapi.model.food.FoodResponse;
 import dev.chatree.smarthomeapi.model.food.FoodStatus;
+import dev.chatree.smarthomeapi.repository.AccountRepository;
 import dev.chatree.smarthomeapi.repository.FoodRepository;
+import dev.chatree.smarthomeapi.repository.HomeRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,16 +23,24 @@ import java.util.List;
 @Log4j2
 @Service
 public class FoodService {
-
+    private final AccountRepository accountRepository;
+    private final HomeRepository homeRepository;
     private final FoodRepository foodRepository;
 
-    public FoodService(FoodRepository foodRepository) {
+    public FoodService(AccountRepository accountRepository, FoodRepository foodRepository, HomeRepository homeRepository) {
+        this.accountRepository = accountRepository;
         this.foodRepository = foodRepository;
+        this.homeRepository = homeRepository;
     }
 
-    public List<FoodResponse> getAllFood() {
-        List<FoodEntity> foodEntityList = foodRepository.findAllByOrderByExpiryDateAsc();
-        log.info("Found {} items", foodEntityList.size());
+    public List<FoodResponse> getAllFood(Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "This account is not allowed to access this home");
+        }
+
+        List<FoodEntity> foodEntityList = foodRepository.findAllByHomeId(homeId);
         List<FoodResponse> foodResponseList = new ArrayList<>();
 
         for (FoodEntity foodEntity : foodEntityList) {
@@ -38,74 +51,105 @@ public class FoodService {
         return foodResponseList;
     }
 
-    public FoodResponse getFoodById(Long id) {
-        log.info("id: {}", id);
-        FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
+    public FoodResponse getFoodById(Long id, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
+        FoodEntity foodEntity = foodRepository.findByIdAndHomeId(id, homeId);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
 
         FoodResponse foodResponse = generateFoodResponse(foodEntity);
-
-        log.info("getFoodById done!");
+        log.info("Get food by id done!");
         return foodResponse;
     }
 
-    public void createFood(FoodRequest foodRequest) {
+    public void createFood(FoodRequest foodRequest, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
+        HomeEntity homeEntity = homeRepository.findById(homeId).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Home not found"));
         FoodEntity foodEntity = new FoodEntity();
         foodEntity.setName(foodRequest.getName());
+        foodEntity.setBrand(foodRequest.getBrand());
         foodEntity.setQuantity(foodRequest.getQuantity());
         foodEntity.setUnit(foodRequest.getUnit());
         foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
         foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
+        foodEntity.setHome(homeEntity);
 
         foodRepository.save(foodEntity);
-        log.info("createFood done!");
+        log.info("Create food done!");
     }
 
-    public void updateFood(Long id, FoodRequest foodRequest) {
-        log.info("id: {}", id);
+    public void updateFood(Long id, FoodRequest foodRequest, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
         FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
+
         foodEntity.setName(foodRequest.getName());
+        foodEntity.setBrand(foodRequest.getBrand());
         foodEntity.setQuantity(foodRequest.getQuantity());
         foodEntity.setUnit(foodRequest.getUnit());
         foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
         foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
 
         foodRepository.save(foodEntity);
-        log.info("updateFood done!");
+        log.info("Update food done!");
     }
 
-    public void deleteFood(Long id) {
-        log.info("id: {}", id);
+    public void deleteFood(Long id, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
         FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
+
         foodRepository.delete(foodEntity);
-        log.info("deleteFood done!");
+        log.info("Delete food done!");
     }
 
-    public void deleteMultipleFood(List<Long> ids) {
-        log.info("ids: {}", ids);
+    public void deleteMultipleFood(List<Long> ids, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
         foodRepository.deleteAllById(ids);
-        log.info("deleteMultipleFood done!");
+        log.info("Delete multiple food done!");
     }
 
     private FoodResponse generateFoodResponse(FoodEntity foodEntity) {
-        FoodResponse foodResponse = new FoodResponse();
-        foodResponse.setId(foodEntity.getId());
-        foodResponse.setName(foodEntity.getName());
-        foodResponse.setQuantity(foodEntity.getQuantity());
-        foodResponse.setUnit(foodEntity.getUnit());
-        foodResponse.setBuyDate(foodEntity.getBuyDate().toString());
-        foodResponse.setExpiryDate(foodEntity.getExpiryDate().toString());
-        foodResponse.setStatus(checkFoodStatus(foodEntity.getExpiryDate()));
-
-        return foodResponse;
+        return FoodResponse.builder()
+                .id(foodEntity.getId())
+                .name(foodEntity.getName())
+                .brand(foodEntity.getBrand())
+                .quantity(foodEntity.getQuantity())
+                .unit(foodEntity.getUnit())
+                .buyDate(foodEntity.getBuyDate().toString())
+                .expiryDate(foodEntity.getExpiryDate().toString())
+                .status(checkFoodStatus(foodEntity.getExpiryDate()))
+                .build();
     }
 
     private FoodStatus checkFoodStatus(LocalDate expiryDate) {

@@ -17,6 +17,9 @@ public class FoodEntity {
     @Column(name = "Name")
     private String name;
 
+    @Column(name = "Brand")
+    private String brand;
+
     @Column(name = "Quantity")
     private Double quantity;
 
@@ -34,6 +37,10 @@ public class FoodEntity {
 
     @Column(name = "UpdateDate")
     private Date updateDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "HomeId")
+    private HomeEntity home;
 
     @PrePersist
     public void prePersist() {

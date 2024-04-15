@@ -3,12 +3,14 @@ package dev.chatree.smarthomeapi.controller;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
 import dev.chatree.smarthomeapi.model.food.FoodRequest;
 import dev.chatree.smarthomeapi.model.food.FoodResponse;
+import dev.chatree.smarthomeapi.service.AccountService;
 import dev.chatree.smarthomeapi.service.FoodService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -20,68 +22,97 @@ import java.util.List;
 public class FoodController {
 
     private final FoodService foodService;
+    private final AccountService accountService;
 
-    public FoodController(FoodService foodService) {
+    public FoodController(FoodService foodService, AccountService accountService) {
         this.foodService = foodService;
+        this.accountService = accountService;
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodResponse>> getAllFood(HttpServletRequest request) {
+    public ResponseEntity<?> getAllFood(@RequestParam("homeId") Long homeId,
+                                        Authentication authentication,
+                                        HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        return ResponseEntity.ok(foodService.getAllFood());
+        try {
+            String subject = authentication.getName();
+            List<FoodResponse> foodResponseList = foodService.getAllFood(homeId, subject);
+            return ResponseEntity.ok(foodResponseList);
+        } catch (HttpClientErrorException e) {
+            log.info("Error: {} {}", e.getMessage(), e.getStatusText());
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getFoodById(@PathVariable Long id,
+    public ResponseEntity<?> getFoodById(@RequestParam("homeId") Long homeId,
+                                         @PathVariable Long id,
+                                         Authentication authentication,
                                          HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            FoodResponse foodResponse = foodService.getFoodById(id);
-            log.info("{}", foodResponse);
+            String subject = authentication.getName();
+            FoodResponse foodResponse = foodService.getFoodById(id, homeId, subject);
             return ResponseEntity.ok(foodResponse);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> createFood(@RequestBody FoodRequest foodRequest,
+    public ResponseEntity<?> createFood(@RequestParam("homeId") Long homeId,
+                                        @RequestBody FoodRequest foodRequest,
+                                        Authentication authentication,
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        foodService.createFood(foodRequest);
-        return ResponseEntity.created(null).build();
+        try {
+            String subject = authentication.getName();
+            foodService.createFood(foodRequest, homeId, subject);
+            return ResponseEntity.created(null).build();
+        } catch (HttpClientErrorException e) {
+            log.info("Error: {} {}", e.getMessage(), e.getStatusText());
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFood(@PathVariable Long id,
+                                        @RequestParam("homeId") Long homeId,
                                         @RequestBody FoodRequest foodRequest,
+                                        Authentication authentication,
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            foodService.updateFood(id, foodRequest);
+            String subject = authentication.getName();
+            foodService.updateFood(id, foodRequest, homeId, subject);
             return ResponseEntity.ok().build();
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFood(@PathVariable Long id,
+                                        @RequestParam("homeId") Long homeId,
+                                        Authentication authentication,
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            foodService.deleteFood(id);
+            String subject = authentication.getName();
+            foodService.deleteFood(id, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
         }
     }
 
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<?> deleteMultipleFood(String ids,
+    public ResponseEntity<?> deleteMultipleFood(@RequestParam("homeId") Long homeId,
+                                                Authentication authentication,
+                                                String ids,
                                                 HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         if (ids.isBlank()) {
@@ -91,12 +122,16 @@ public class FoodController {
 
         List<String> idStringList = List.of(ids.split(","));
         try {
+            String subject = authentication.getName();
             List<Long> idList = idStringList.stream().map(Long::parseLong).toList();
-            foodService.deleteMultipleFood(idList);
+            foodService.deleteMultipleFood(idList, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (NumberFormatException e) {
             log.info("Error: {} {}", e.getMessage(), e.getClass().getSimpleName());
             return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "ids must be a number"));
+        } catch (HttpClientErrorException e) {
+            log.info("Error: {} {}", e.getMessage(), e.getStatusText());
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
         }
     }
 }

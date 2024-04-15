@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 public class InventoryResponse {
     private long id;
     private String name;
+    private String brand;
     private Double quantity;
     private Double maxQuantity;
     private String unit;
     private InventoryStatus status;
+    private String restockDate;
 }

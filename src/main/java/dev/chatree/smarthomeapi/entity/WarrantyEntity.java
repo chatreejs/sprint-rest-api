@@ -41,6 +41,10 @@ public class WarrantyEntity {
     @Column(name = "UpdateDate")
     private Date updateDate;
 
+    @ManyToOne
+    @JoinColumn(name = "HomeId")
+    private HomeEntity home;
+
     @PrePersist
     public void prePersist() {
         Date now = new Date();

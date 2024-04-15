@@ -27,7 +27,6 @@ public class WarrantyService {
 
     public List<WarrantyResponse> getAllWarranty() {
         List<WarrantyEntity> warrantyEntityList = warrantyRepository.findAllByOrderByWarrantyDateAsc();
-        log.info("Found {} items", warrantyEntityList.size());
         List<WarrantyResponse> warrantyResponseList = new ArrayList<>();
 
         for (WarrantyEntity warrantyEntity : warrantyEntityList) {
@@ -40,7 +39,6 @@ public class WarrantyService {
     }
 
     public WarrantyResponse getWarrantyById(Long id) {
-        log.info("id: {}", id);
         WarrantyEntity warrantyEntity = warrantyRepository.findById(id).orElse(null);
         if (warrantyEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Warranty not found");
@@ -48,7 +46,7 @@ public class WarrantyService {
 
         WarrantyResponse warrantyResponse = generateWarrantyResponse(warrantyEntity);
 
-        log.info("getWarrantyById done!");
+        log.info("Get warranty by id done!");
         return warrantyResponse;
     }
 
@@ -63,11 +61,10 @@ public class WarrantyService {
         warrantyEntity.setWarrantyDate(LocalDate.parse(warrantyRequest.getWarrantyDate(), DateTimeFormatter.ISO_DATE));
 
         warrantyRepository.save(warrantyEntity);
-        log.info("createWarranty done!");
+        log.info("Create warranty done!");
     }
 
     public void updateWarranty(Long id, WarrantyRequest warrantyRequest) {
-        log.info("id: {}", id);
         WarrantyEntity warrantyEntity = warrantyRepository.findById(id).orElse(null);
         if (warrantyEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Warranty not found");
@@ -81,7 +78,7 @@ public class WarrantyService {
         warrantyEntity.setWarrantyDate(LocalDate.parse(warrantyRequest.getWarrantyDate(), DateTimeFormatter.ISO_DATE));
 
         warrantyRepository.save(warrantyEntity);
-        log.info("updateWarranty done!");
+        log.info("Update warranty done!");
     }
 
     public void deleteWarranty(Long id) {
@@ -91,13 +88,13 @@ public class WarrantyService {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Warranty not found");
         }
         warrantyRepository.delete(warrantyEntity);
-        log.info("deleteWarranty done!");
+        log.info("Delete warranty done!");
     }
 
     public void deleteMultipleWarranty(List<Long> ids) {
         log.info("ids: {}", ids);
         warrantyRepository.deleteAllById(ids);
-        log.info("deleteMultipleWarranty done!");
+        log.info("Delete multiple warranty done!");
     }
 
     private WarrantyResponse generateWarrantyResponse(WarrantyEntity warrantyEntity) {

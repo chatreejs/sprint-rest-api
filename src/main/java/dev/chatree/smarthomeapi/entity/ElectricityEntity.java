@@ -7,26 +7,38 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "Inventory")
-public class InventoryEntity {
+@Table(name = "Electricity")
+public class ElectricityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "Name")
-    private String name;
+    @Column(name = "InvoiceNumber")
+    private String invoiceNumber;
 
-    @Column(name = "Brand")
-    private String brand;
+    @Column(name = "InvoiceDate")
+    private Date invoiceDate;
 
-    @Column(name = "Quantity")
-    private Double quantity;
+    @Column(name = "Usage")
+    private Integer usage;
 
-    @Column(name = "MaxQuantity")
-    private Double maxQuantity;
+    @Column(name = "FtRate")
+    private Double ftRate;
 
-    @Column(name = "Unit")
-    private String unit;
+    @Column(name = "ElectricityPrice")
+    private Double electricityPrice;
+
+    @Column(name = "ServiceCharge")
+    private Double serviceCharge;
+
+    @Column(name = "Ft")
+    private Double ft;
+
+    @Column(name = "Vat")
+    private Double vat;
+
+    @Column(name = "Total")
+    private Double total;
 
     @Column(name = "CreateDate")
     private Date createDate;

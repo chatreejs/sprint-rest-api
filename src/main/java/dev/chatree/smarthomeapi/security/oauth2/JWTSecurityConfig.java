@@ -1,4 +1,4 @@
-package dev.chatree.smarthomeapi.config.oauth2;
+package dev.chatree.smarthomeapi.security.oauth2;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,14 +1,17 @@
 package dev.chatree.smarthomeapi.controller;
 
+import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
 import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
 import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
+import dev.chatree.smarthomeapi.service.AccountService;
 import dev.chatree.smarthomeapi.service.InventoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -20,15 +23,28 @@ import java.util.List;
 public class InventoryController {
 
     private final InventoryService inventoryService;
+    private final AccountService accountService;
 
-    public InventoryController(InventoryService inventoryService) {
+    public InventoryController(InventoryService inventoryService, AccountService accountService) {
         this.inventoryService = inventoryService;
+        this.accountService = accountService;
     }
 
     @GetMapping
-    public ResponseEntity<List<InventoryResponse>> getAllInventory(HttpServletRequest request) {
+    public ResponseEntity<?> getAllInventory(
+            @RequestParam("homeId") Long homeId,
+            Authentication authentication,
+            HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        return ResponseEntity.ok(inventoryService.getAllInventory());
+        try {
+            String subject = authentication.getName();
+            AccountEntity accountEntity = accountService.getAccountBySubject(subject);
+            List<InventoryResponse> inventoryResponseList = inventoryService.getAllInventory(homeId, accountEntity);
+            return ResponseEntity.ok(inventoryResponseList);
+        } catch (HttpClientErrorException e) {
+            log.info("Error: {} {}", e.getMessage(), e.getStatusText());
+            return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getStatusCode().value(), e.getStatusText()));
+        }
     }
 
     @GetMapping("/{id}")

@@ -1,4 +1,4 @@
-package dev.chatree.smarthomeapi.config.security;
+package dev.chatree.smarthomeapi.security;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
