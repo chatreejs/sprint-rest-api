@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -15,8 +15,8 @@ public class HomeResponse {
     private long id;
     private String name;
     private String address;
-    private Double latitude;
-    private Double longitude;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
     private Boolean isOwner;
     private String createDate;
     private String updateDate;

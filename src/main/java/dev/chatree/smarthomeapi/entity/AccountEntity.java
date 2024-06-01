@@ -3,7 +3,6 @@ package dev.chatree.smarthomeapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -31,9 +30,9 @@ public class AccountEntity {
 
     @ManyToMany
     @JoinTable(
-        name = "Home_Account",
-        joinColumns = @JoinColumn(name = "AccountId"),
-        inverseJoinColumns = @JoinColumn(name = "HomeId")
+            name = "Home_Account",
+            joinColumns = @JoinColumn(name = "AccountId"),
+            inverseJoinColumns = @JoinColumn(name = "HomeId")
     )
     private Set<HomeEntity> homes;
 }

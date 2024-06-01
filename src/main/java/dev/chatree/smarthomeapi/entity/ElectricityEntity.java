@@ -3,7 +3,9 @@ package dev.chatree.smarthomeapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -17,34 +19,34 @@ public class ElectricityEntity {
     private String invoiceNumber;
 
     @Column(name = "InvoiceDate")
-    private Date invoiceDate;
+    private LocalDate invoiceDate;
 
     @Column(name = "Usage")
     private Integer usage;
 
     @Column(name = "FtRate")
-    private Double ftRate;
+    private BigDecimal ftRate;
 
     @Column(name = "ElectricityPrice")
-    private Double electricityPrice;
+    private BigDecimal electricityPrice;
 
     @Column(name = "ServiceCharge")
-    private Double serviceCharge;
+    private BigDecimal serviceCharge;
 
     @Column(name = "Ft")
-    private Double ft;
+    private BigDecimal ft;
 
     @Column(name = "Vat")
-    private Double vat;
+    private BigDecimal vat;
 
     @Column(name = "Total")
-    private Double total;
+    private BigDecimal total;
 
     @Column(name = "CreateDate")
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @Column(name = "UpdateDate")
-    private Date updateDate;
+    private LocalDateTime updateDate;
 
     @ManyToOne
     @JoinColumn(name = "HomeId")
@@ -52,13 +54,13 @@ public class ElectricityEntity {
 
     @PrePersist
     public void prePersist() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         this.createDate = now;
         this.updateDate = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateDate = new Date();
+        this.updateDate = LocalDateTime.now();
     }
 }

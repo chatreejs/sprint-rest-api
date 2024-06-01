@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -33,24 +33,24 @@ public class FoodEntity {
     private LocalDate expiryDate;
 
     @Column(name = "CreateDate")
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @Column(name = "UpdateDate")
-    private Date updateDate;
-    
+    private LocalDateTime updateDate;
+
     @ManyToOne
     @JoinColumn(name = "HomeId")
     private HomeEntity home;
 
     @PrePersist
     public void prePersist() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         this.createDate = now;
         this.updateDate = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateDate = new Date();
+        this.updateDate = LocalDateTime.now();
     }
 }

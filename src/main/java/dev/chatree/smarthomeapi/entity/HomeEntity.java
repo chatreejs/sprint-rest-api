@@ -3,7 +3,8 @@ package dev.chatree.smarthomeapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -22,10 +23,10 @@ public class HomeEntity {
     private String address;
 
     @Column(name = "Latitude")
-    private Double latitude;
+    private BigDecimal latitude;
 
     @Column(name = "Longitude")
-    private Double longitude;
+    private BigDecimal longitude;
 
     @Column(name = "Owner")
     private Long owner;
@@ -37,20 +38,20 @@ public class HomeEntity {
     private List<FoodEntity> foods;
 
     @Column(name = "CreateDate")
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @Column(name = "UpdateDate")
-    private Date updateDate;
+    private LocalDateTime updateDate;
 
     @PrePersist
     public void prePersist() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         this.createDate = now;
         this.updateDate = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateDate = new Date();
+        this.updateDate = LocalDateTime.now();
     }
 }

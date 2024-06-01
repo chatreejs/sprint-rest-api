@@ -3,7 +3,7 @@ package dev.chatree.smarthomeapi.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -29,10 +29,10 @@ public class InventoryEntity {
     private String unit;
 
     @Column(name = "CreateDate")
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @Column(name = "UpdateDate")
-    private Date updateDate;
+    private LocalDateTime updateDate;
 
     @ManyToOne
     @JoinColumn(name = "HomeId")
@@ -40,13 +40,13 @@ public class InventoryEntity {
 
     @PrePersist
     public void prePersist() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         this.createDate = now;
         this.updateDate = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateDate = new Date();
+        this.updateDate = LocalDateTime.now();
     }
 }
