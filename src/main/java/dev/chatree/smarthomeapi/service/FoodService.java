@@ -44,7 +44,11 @@ public class FoodService {
         List<FoodResponse> foodResponseList = new ArrayList<>();
 
         for (FoodEntity foodEntity : foodEntityList) {
-            FoodResponse foodResponse = generateFoodResponse(foodEntity);
+            AccountEntity updateBy = foodEntity.getUpdateBy();
+            if (updateBy == null) {
+                updateBy = foodEntity.getCreateBy();
+            }
+            FoodResponse foodResponse = generateFoodResponse(foodEntity, updateBy);
             foodResponseList.add(foodResponse);
         }
         log.info("Get all food done!");
@@ -63,7 +67,11 @@ public class FoodService {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
 
-        FoodResponse foodResponse = generateFoodResponse(foodEntity);
+        AccountEntity updateBy = foodEntity.getUpdateBy();
+        if (updateBy == null) {
+            updateBy = foodEntity.getCreateBy();
+        }
+        FoodResponse foodResponse = generateFoodResponse(foodEntity, updateBy);
         log.info("Get food by id done!");
         return foodResponse;
     }
@@ -83,6 +91,7 @@ public class FoodService {
         foodEntity.setUnit(foodRequest.getUnit());
         foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
         foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
+        foodEntity.setCreateBy(account);
         foodEntity.setHome(homeEntity);
 
         foodRepository.save(foodEntity);
@@ -106,6 +115,7 @@ public class FoodService {
         foodEntity.setQuantity(foodRequest.getQuantity());
         foodEntity.setUnit(foodRequest.getUnit());
         foodEntity.setBuyDate(LocalDate.parse(foodRequest.getBuyDate(), DateTimeFormatter.ISO_DATE));
+        foodEntity.setUpdateBy(account);
         foodEntity.setExpiryDate(LocalDate.parse(foodRequest.getExpiryDate(), DateTimeFormatter.ISO_DATE));
 
         foodRepository.save(foodEntity);
@@ -139,7 +149,7 @@ public class FoodService {
         log.info("Delete multiple food done!");
     }
 
-    private FoodResponse generateFoodResponse(FoodEntity foodEntity) {
+    private FoodResponse generateFoodResponse(FoodEntity foodEntity, AccountEntity updateBy) {
         return FoodResponse.builder()
                 .id(foodEntity.getId())
                 .name(foodEntity.getName())
@@ -149,6 +159,8 @@ public class FoodService {
                 .buyDate(foodEntity.getBuyDate().toString())
                 .expiryDate(foodEntity.getExpiryDate().toString())
                 .status(checkFoodStatus(foodEntity.getExpiryDate()))
+                .updateBy(updateBy.getUsername())
+                .updateDate(foodEntity.getUpdateDate().toString())
                 .build();
     }
 

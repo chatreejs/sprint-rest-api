@@ -32,6 +32,14 @@ public class FoodEntity {
     @Column(name = "ExpiryDate")
     private LocalDate expiryDate;
 
+    @OneToOne
+    @JoinColumn(name = "CreateBy")
+    private AccountEntity createBy;
+
+    @OneToOne
+    @JoinColumn(name = "UpdateBy")
+    private AccountEntity updateBy;
+
     @Column(name = "CreateDate")
     private LocalDateTime createDate;
 

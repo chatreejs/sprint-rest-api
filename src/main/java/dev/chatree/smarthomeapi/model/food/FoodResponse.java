@@ -18,4 +18,6 @@ public class FoodResponse {
     private String buyDate;
     private String expiryDate;
     private FoodStatus status;
+    private String updateBy;
+    private String updateDate;
 }
