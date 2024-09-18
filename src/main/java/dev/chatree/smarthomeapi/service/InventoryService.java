@@ -1,31 +1,41 @@
 package dev.chatree.smarthomeapi.service;
 
+import dev.chatree.smarthomeapi.constant.ErrorMessage;
 import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.entity.InventoryEntity;
 import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
 import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
 import dev.chatree.smarthomeapi.model.inventory.InventoryStatus;
+import dev.chatree.smarthomeapi.repository.AccountRepository;
+import dev.chatree.smarthomeapi.repository.HomeRepository;
 import dev.chatree.smarthomeapi.repository.InventoryRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class InventoryService {
-
+    private final AccountRepository accountRepository;
+    private final HomeRepository homeRepository;
     private final InventoryRepository inventoryRepository;
 
-    public InventoryService(InventoryRepository inventoryRepository) {
-        this.inventoryRepository = inventoryRepository;
-    }
+    public List<InventoryResponse> getAllInventory(Long homeId, String subject) {
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "This account is not allowed to access this home");
+        }
 
-    public List<InventoryResponse> getAllInventory(Long homeId, AccountEntity account) {
-        List<InventoryEntity> inventoryEntityList = inventoryRepository.findAllByOrderByQuantityAsc();
+        var inventoryEntityList = inventoryRepository.findAllByHomeIdAndOrderByQuantityAsc(homeId);
         inventoryEntityList.sort((o1, o2) -> {
             if (o1.getQuantity() <= (o1.getMaxQuantity() * 0.3)) {
                 return -1;
@@ -36,79 +46,129 @@ public class InventoryService {
             }
         });
 
-        List<InventoryResponse> inventoryResponseList = new ArrayList<>();
+        var inventoryResponseList = new ArrayList<InventoryResponse>();
 
-        for (InventoryEntity inventoryEntity : inventoryEntityList) {
-            InventoryResponse inventoryResponse = generateInventoryResponse(inventoryEntity);
+        for (var inventoryEntity : inventoryEntityList) {
+            var updateBy = inventoryEntity.getUpdateBy();
+            if (updateBy == null) {
+                updateBy = inventoryEntity.getCreateBy();
+            }
+            var inventoryResponse = generateInventoryResponse(inventoryEntity, updateBy);
             inventoryResponseList.add(inventoryResponse);
         }
         log.info("Get all inventory done!");
         return inventoryResponseList;
     }
 
-    public InventoryResponse getInventoryById(Long id) {
-        InventoryEntity inventoryEntity = inventoryRepository.findById(id).orElse(null);
+    public InventoryResponse getInventoryById(Long id, Long homeId, String subject) {
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "This account is not allowed to access this home");
+        }
+
+        var inventoryEntity = inventoryRepository.findByIdAndHomeId(id, homeId);
         if (inventoryEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
         }
 
-        InventoryResponse inventoryResponse = generateInventoryResponse(inventoryEntity);
+        var updateBy = inventoryEntity.getUpdateBy();
+        if (updateBy == null) {
+            updateBy = inventoryEntity.getCreateBy();
+        }
+
+        var inventoryResponse = generateInventoryResponse(inventoryEntity, updateBy);
 
         log.info("Get inventory by id done!");
         return inventoryResponse;
     }
 
-    public void createInventory(InventoryRequest inventoryRequest) {
-        InventoryEntity inventoryEntity = new InventoryEntity();
+    public void createInventory(InventoryRequest inventoryRequest, Long homeId, String subject) {
+        AccountEntity account = accountRepository.findBySubject(subject);
+        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
+        var homeEntity = homeRepository.findById(homeId).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Home not found"));
+        var inventoryEntity = new InventoryEntity();
         inventoryEntity.setName(inventoryRequest.getName());
+        inventoryEntity.setBrand(inventoryRequest.getBrand());
         inventoryEntity.setQuantity(inventoryRequest.getQuantity());
         inventoryEntity.setMaxQuantity(inventoryRequest.getMaxQuantity());
         inventoryEntity.setUnit(inventoryRequest.getUnit());
+        inventoryEntity.setRestockDate(LocalDate.parse(inventoryRequest.getRestockDate(), DateTimeFormatter.ISO_DATE));
+        inventoryEntity.setCreateBy(account);
+        inventoryEntity.setHome(homeEntity);
 
         inventoryRepository.save(inventoryEntity);
         log.info("Create inventory done!");
     }
 
-    public void updateInventory(Long id, InventoryRequest inventoryRequest) {
-        InventoryEntity inventoryEntity = inventoryRepository.findById(id).orElse(null);
+    public void updateInventory(Long id, InventoryRequest inventoryRequest, Long homeId, String subject) {
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
+        var inventoryEntity = inventoryRepository.findById(id).orElse(null);
         if (inventoryEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
         }
+
         inventoryEntity.setName(inventoryRequest.getName());
+        inventoryEntity.setBrand(inventoryRequest.getBrand());
         inventoryEntity.setQuantity(inventoryRequest.getQuantity());
         inventoryEntity.setMaxQuantity(inventoryRequest.getMaxQuantity());
         inventoryEntity.setUnit(inventoryRequest.getUnit());
+        inventoryEntity.setRestockDate(LocalDate.parse(inventoryRequest.getRestockDate(), DateTimeFormatter.ISO_DATE));
+        inventoryEntity.setUpdateBy(account);
 
         inventoryRepository.save(inventoryEntity);
         log.info("Update inventory done!");
     }
 
-    public void deleteInventory(Long id) {
-        log.info("id: {}", id);
-        InventoryEntity inventoryEntity = inventoryRepository.findById(id).orElse(null);
+    public void deleteInventory(Long id, Long homeId, String subject) {
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
+        var inventoryEntity = inventoryRepository.findById(id).orElse(null);
         if (inventoryEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Inventory not found");
         }
+
         inventoryRepository.deleteById(id);
         log.info("Delete inventory done!");
     }
 
-    public void deleteMultipleInventory(List<Long> ids) {
-        log.info("ids: {}", ids);
+    public void deleteMultipleInventory(List<Long> ids, Long homeId, String subject) {
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        if (!isHomeOwner) {
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
+        }
+
         inventoryRepository.deleteAllById(ids);
         log.info("Delete multiple inventory done!");
     }
 
-    private InventoryResponse generateInventoryResponse(InventoryEntity inventoryEntity) {
-        InventoryResponse inventoryResponse = new InventoryResponse();
-        inventoryResponse.setId(inventoryEntity.getId());
-        inventoryResponse.setName(inventoryEntity.getName());
-        inventoryResponse.setQuantity(inventoryEntity.getQuantity());
-        inventoryResponse.setMaxQuantity(inventoryEntity.getMaxQuantity());
-        inventoryResponse.setUnit(inventoryEntity.getUnit());
-        inventoryResponse.setStatus(checkInventoryStatus(inventoryEntity.getQuantity(), inventoryEntity.getMaxQuantity()));
-
-        return inventoryResponse;
+    private InventoryResponse generateInventoryResponse(InventoryEntity inventoryEntity, AccountEntity updateBy) {
+        return InventoryResponse.builder()
+                .id(inventoryEntity.getId())
+                .name(inventoryEntity.getName())
+                .brand(inventoryEntity.getBrand())
+                .quantity(inventoryEntity.getQuantity())
+                .maxQuantity(inventoryEntity.getMaxQuantity())
+                .unit(inventoryEntity.getUnit())
+                .restockDate(inventoryEntity.getRestockDate().toString())
+                .status(checkInventoryStatus(inventoryEntity.getQuantity(), inventoryEntity.getMaxQuantity()))
+                .updateBy(updateBy.getUsername())
+                .updateDate(inventoryEntity.getUpdateDate().toString())
+                .build();
     }
 
     private InventoryStatus checkInventoryStatus(Double quantity, Double maxQuantity) {

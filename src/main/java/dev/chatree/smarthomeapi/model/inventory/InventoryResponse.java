@@ -1,10 +1,12 @@
 package dev.chatree.smarthomeapi.model.inventory;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class InventoryResponse {
@@ -16,4 +18,6 @@ public class InventoryResponse {
     private String unit;
     private InventoryStatus status;
     private String restockDate;
+    private String updateBy;
+    private String updateDate;
 }

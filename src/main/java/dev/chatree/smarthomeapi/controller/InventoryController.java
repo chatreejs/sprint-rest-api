@@ -1,12 +1,10 @@
 package dev.chatree.smarthomeapi.controller;
 
-import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.model.ErrorResponse;
 import dev.chatree.smarthomeapi.model.inventory.InventoryRequest;
-import dev.chatree.smarthomeapi.model.inventory.InventoryResponse;
-import dev.chatree.smarthomeapi.service.AccountService;
 import dev.chatree.smarthomeapi.service.InventoryService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,15 +18,10 @@ import java.util.List;
 @Log4j2
 @RestController
 @RequestMapping("/inventories")
+@RequiredArgsConstructor
 public class InventoryController {
 
     private final InventoryService inventoryService;
-    private final AccountService accountService;
-
-    public InventoryController(InventoryService inventoryService, AccountService accountService) {
-        this.inventoryService = inventoryService;
-        this.accountService = accountService;
-    }
 
     @GetMapping
     public ResponseEntity<?> getAllInventory(
@@ -37,9 +30,8 @@ public class InventoryController {
             HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
-            AccountEntity accountEntity = accountService.getAccountBySubject(subject);
-            List<InventoryResponse> inventoryResponseList = inventoryService.getAllInventory(homeId, accountEntity);
+            var subject = authentication.getName();
+            var inventoryResponseList = inventoryService.getAllInventory(homeId, subject);
             return ResponseEntity.ok(inventoryResponseList);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -49,10 +41,13 @@ public class InventoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getInventoryById(@PathVariable Long id,
+                                              @RequestParam("homeId") Long homeId,
+                                              Authentication authentication,
                                               HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            InventoryResponse inventoryResponse = inventoryService.getInventoryById(id);
+            var subject = authentication.getName();
+            var inventoryResponse = inventoryService.getInventoryById(id, homeId, subject);
             return ResponseEntity.ok(inventoryResponse);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -61,20 +56,31 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createInventory(@RequestBody InventoryRequest inventory,
+    public ResponseEntity<?> createInventory(@RequestParam("homeId") Long homeId,
+                                             @RequestBody InventoryRequest inventory,
+                                             Authentication authentication,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
-        inventoryService.createInventory(inventory);
-        return ResponseEntity.created(null).build();
+        try {
+            var subject = authentication.getName();
+            inventoryService.createInventory(inventory, homeId, subject);
+            return ResponseEntity.created(null).build();
+        } catch (HttpClientErrorException e) {
+            log.info("Error: {} {}", e.getMessage(), e.getStatusText());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getStatusText()));
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateInventory(@PathVariable Long id,
+                                             @RequestParam("homeId") Long homeId,
                                              @RequestBody InventoryRequest inventory,
+                                             Authentication authentication,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            inventoryService.updateInventory(id, inventory);
+            var subject = authentication.getName();
+            inventoryService.updateInventory(id, inventory, homeId, subject);
             return ResponseEntity.ok().build();
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -84,10 +90,13 @@ public class InventoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteInventory(@PathVariable Long id,
+                                             @RequestParam("homeId") Long homeId,
+                                             Authentication authentication,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            inventoryService.deleteInventory(id);
+            var subject = authentication.getName();
+            inventoryService.deleteInventory(id, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -96,7 +105,9 @@ public class InventoryController {
     }
 
     @DeleteMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<?> deleteInventory(@RequestParam String ids,
+    public ResponseEntity<?> deleteInventory(@RequestParam("homeId") Long homeId,
+                                             Authentication authentication,
+                                             String ids,
                                              HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         if (ids.isBlank()) {
@@ -106,8 +117,9 @@ public class InventoryController {
 
         List<String> idStringList = List.of(ids.split(","));
         try {
-            List<Long> idList = idStringList.stream().map(Long::parseLong).toList();
-            inventoryService.deleteMultipleInventory(idList);
+            var subject = authentication.getName();
+            var idList = idStringList.stream().map(Long::parseLong).toList();
+            inventoryService.deleteMultipleInventory(idList, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "ids must be a number"));

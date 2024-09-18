@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InventoryRequest {
     private String name;
+    private String brand;
     private Double quantity;
     private Double maxQuantity;
     private String unit;
+    private String restockDate;
 }
