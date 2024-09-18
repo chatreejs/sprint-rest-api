@@ -2,6 +2,8 @@ package dev.chatree.smarthomeapi.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,33 +34,23 @@ public class FoodEntity {
     @Column(name = "ExpiryDate")
     private LocalDate expiryDate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "CreateBy")
     private AccountEntity createBy;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "UpdateBy")
     private AccountEntity updateBy;
 
+    @CreationTimestamp
     @Column(name = "CreateDate")
     private LocalDateTime createDate;
 
+    @UpdateTimestamp
     @Column(name = "UpdateDate")
     private LocalDateTime updateDate;
 
     @ManyToOne
     @JoinColumn(name = "HomeId")
     private HomeEntity home;
-
-    @PrePersist
-    public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createDate = now;
-        this.updateDate = now;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updateDate = LocalDateTime.now();
-    }
 }
