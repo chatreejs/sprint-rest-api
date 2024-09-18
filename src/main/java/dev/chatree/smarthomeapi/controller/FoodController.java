@@ -6,6 +6,7 @@ import dev.chatree.smarthomeapi.model.food.FoodResponse;
 import dev.chatree.smarthomeapi.service.AccountService;
 import dev.chatree.smarthomeapi.service.FoodService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,20 +15,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import javax.management.ConstructorParameters;
 import java.util.List;
 
 @Log4j2
 @RestController
 @RequestMapping("/foods")
+@RequiredArgsConstructor
 public class FoodController {
 
     private final FoodService foodService;
-    private final AccountService accountService;
-
-    public FoodController(FoodService foodService, AccountService accountService) {
-        this.foodService = foodService;
-        this.accountService = accountService;
-    }
 
     @GetMapping
     public ResponseEntity<?> getAllFood(@RequestParam("homeId") Long homeId,
@@ -35,8 +32,8 @@ public class FoodController {
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
-            List<FoodResponse> foodResponseList = foodService.getAllFood(homeId, subject);
+            var subject = authentication.getName();
+            var foodResponseList = foodService.getAllFood(homeId, subject);
             return ResponseEntity.ok(foodResponseList);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -51,8 +48,8 @@ public class FoodController {
                                          HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
-            FoodResponse foodResponse = foodService.getFoodById(id, homeId, subject);
+            var subject = authentication.getName();
+            var foodResponse = foodService.getFoodById(id, homeId, subject);
             return ResponseEntity.ok(foodResponse);
         } catch (HttpClientErrorException e) {
             log.info("Error: {} {}", e.getMessage(), e.getStatusText());
@@ -67,7 +64,7 @@ public class FoodController {
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
+            var subject = authentication.getName();
             foodService.createFood(foodRequest, homeId, subject);
             return ResponseEntity.created(null).build();
         } catch (HttpClientErrorException e) {
@@ -84,7 +81,7 @@ public class FoodController {
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
+            var subject = authentication.getName();
             foodService.updateFood(id, foodRequest, homeId, subject);
             return ResponseEntity.ok().build();
         } catch (HttpClientErrorException e) {
@@ -100,7 +97,7 @@ public class FoodController {
                                         HttpServletRequest request) {
         log.info("API {}: {}", request.getMethod(), request.getServletPath());
         try {
-            String subject = authentication.getName();
+            var subject = authentication.getName();
             foodService.deleteFood(id, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (HttpClientErrorException e) {
@@ -120,10 +117,10 @@ public class FoodController {
             return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "ids must not be null"));
         }
 
-        List<String> idStringList = List.of(ids.split(","));
+        var idStringList = List.of(ids.split(","));
         try {
-            String subject = authentication.getName();
-            List<Long> idList = idStringList.stream().map(Long::parseLong).toList();
+            var subject = authentication.getName();
+            var idList = idStringList.stream().map(Long::parseLong).toList();
             foodService.deleteMultipleFood(idList, homeId, subject);
             return ResponseEntity.noContent().build();
         } catch (NumberFormatException e) {

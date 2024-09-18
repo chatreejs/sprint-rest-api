@@ -10,6 +10,7 @@ import dev.chatree.smarthomeapi.model.food.FoodStatus;
 import dev.chatree.smarthomeapi.repository.AccountRepository;
 import dev.chatree.smarthomeapi.repository.FoodRepository;
 import dev.chatree.smarthomeapi.repository.HomeRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,33 +23,28 @@ import java.util.List;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class FoodService {
     private final AccountRepository accountRepository;
     private final HomeRepository homeRepository;
     private final FoodRepository foodRepository;
 
-    public FoodService(AccountRepository accountRepository, FoodRepository foodRepository, HomeRepository homeRepository) {
-        this.accountRepository = accountRepository;
-        this.foodRepository = foodRepository;
-        this.homeRepository = homeRepository;
-    }
-
     public List<FoodResponse> getAllFood(Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
-        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "This account is not allowed to access this home");
         }
 
-        List<FoodEntity> foodEntityList = foodRepository.findAllByHomeId(homeId);
-        List<FoodResponse> foodResponseList = new ArrayList<>();
+        var foodEntityList = foodRepository.findAllByHomeId(homeId);
+        var foodResponseList = new ArrayList<FoodResponse>();
 
-        for (FoodEntity foodEntity : foodEntityList) {
-            AccountEntity updateBy = foodEntity.getUpdateBy();
+        for (var foodEntity : foodEntityList) {
+            var updateBy = foodEntity.getUpdateBy();
             if (updateBy == null) {
                 updateBy = foodEntity.getCreateBy();
             }
-            FoodResponse foodResponse = generateFoodResponse(foodEntity, updateBy);
+            var foodResponse = generateFoodResponse(foodEntity, updateBy);
             foodResponseList.add(foodResponse);
         }
         log.info("Get all food done!");
@@ -56,35 +52,35 @@ public class FoodService {
     }
 
     public FoodResponse getFoodById(Long id, Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
-        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
         }
 
-        FoodEntity foodEntity = foodRepository.findByIdAndHomeId(id, homeId);
+        var foodEntity = foodRepository.findByIdAndHomeId(id, homeId);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
 
-        AccountEntity updateBy = foodEntity.getUpdateBy();
+        var updateBy = foodEntity.getUpdateBy();
         if (updateBy == null) {
             updateBy = foodEntity.getCreateBy();
         }
-        FoodResponse foodResponse = generateFoodResponse(foodEntity, updateBy);
+        var foodResponse = generateFoodResponse(foodEntity, updateBy);
         log.info("Get food by id done!");
         return foodResponse;
     }
 
     public void createFood(FoodRequest foodRequest, Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
-        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
         }
 
-        HomeEntity homeEntity = homeRepository.findById(homeId).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Home not found"));
-        FoodEntity foodEntity = new FoodEntity();
+        var homeEntity = homeRepository.findById(homeId).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Home not found"));
+        var foodEntity = new FoodEntity();
         foodEntity.setName(foodRequest.getName());
         foodEntity.setBrand(foodRequest.getBrand());
         foodEntity.setQuantity(foodRequest.getQuantity());
@@ -99,13 +95,13 @@ public class FoodService {
     }
 
     public void updateFood(Long id, FoodRequest foodRequest, Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
-        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
         }
 
-        FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
+        var foodEntity = foodRepository.findById(id).orElse(null);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
@@ -123,13 +119,13 @@ public class FoodService {
     }
 
     public void deleteFood(Long id, Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
-        boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
+        var account = accountRepository.findBySubject(subject);
+        var isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
         }
 
-        FoodEntity foodEntity = foodRepository.findById(id).orElse(null);
+        var foodEntity = foodRepository.findById(id).orElse(null);
         if (foodEntity == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Food not found");
         }
@@ -139,7 +135,7 @@ public class FoodService {
     }
 
     public void deleteMultipleFood(List<Long> ids, Long homeId, String subject) {
-        AccountEntity account = accountRepository.findBySubject(subject);
+        var account = accountRepository.findBySubject(subject);
         boolean isHomeOwner = homeRepository.existsByIdAndAccountsId(homeId, account.getId());
         if (!isHomeOwner) {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN, ErrorMessage.ACCOUNT_NOT_ALLOW_TO_ACCESS_HOME);
