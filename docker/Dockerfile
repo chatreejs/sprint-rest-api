@@ -4,7 +4,7 @@ WORKDIR /home/gradle/src
 COPY --chown=gradle:gradle .. /home/gradle/src
 RUN gradle build -x test
 
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jdk-alpine
 EXPOSE 8080
 
 COPY --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar app.jar
