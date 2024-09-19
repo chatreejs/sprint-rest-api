@@ -3,8 +3,7 @@ pipeline {
 
   environment {
     VERSION = "0.1.0"
-    IMAGE_URL = "registry.chatree.dev/smarthome/api"
-    DESTINATION_SERVER = "10.13.21.1"
+    IMAGE_URL = "chatreejs/smarthome-api"
   }
 
   stages {
@@ -34,7 +33,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
-        sh 'docker build -f docker/Dockerfile . -t ${IMAGE_URL}:${BUILD_VERSION}'
+        sh 'docker build -f Dockerfile . -t ${IMAGE_URL}:${BUILD_VERSION}'
       }
     }
 
@@ -61,8 +60,8 @@ pipeline {
 
     stage('Push to registry') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'chatree-docker-registry-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-          sh 'docker login registry.chatree.dev -u $USERNAME -p $PASSWORD'
+        withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+          sh 'docker login -u $USERNAME -p $PASSWORD'
           sh 'docker push ${IMAGE_URL}:${BUILD_VERSION}'
         }
       }
