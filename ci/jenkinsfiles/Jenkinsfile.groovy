@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     VERSION = "0.1.0"
-    IMAGE_URL = "chatreejs/smarthome-api"
+    IMAGE_URL = "harbor.chatree.dev/chatreejs/smarthome-api"
   }
 
   stages {
@@ -60,8 +60,8 @@ pipeline {
 
     stage('Push to registry') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-          sh 'docker login -u $USERNAME -p $PASSWORD'
+        withCredentials([usernamePassword(credentialsId: 'chatree-docker-registry-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+          sh 'docker login harbor.chatree.dev -u $USERNAME -p $PASSWORD'
           sh 'docker push ${IMAGE_URL}:${BUILD_VERSION}'
         }
       }
@@ -73,17 +73,9 @@ pipeline {
       }
     }
 
-    stage('Deploy') {
+    stage('Deploy to Kubernetes') {
       steps {
-        script {
-          withCredentials([sshUserPrivateKey(credentialsId: 'ctlssh-credential', keyFileVariable: 'IDENTITY', usernameVariable: 'USERNAME')]) {
-            sh "ssh -o StrictHostKeyChecking=no -i ${IDENTITY} ${USERNAME}@${DESTINATION_SERVER} \'docker pull ${IMAGE_URL}:${BUILD_VERSION} \
-            && cd /opt/app/smarthome/smarthome-api \
-            && docker compose down \
-            && sed -i \"s/^\\(TAG_VERSION=\\).*/TAG_VERSION=${BUILD_VERSION}/g\" .env \
-            && docker compose up -d\'"
-          }
-        }
+        build job: 'chatreejs/GitOps/smarthome-api-manifest-dev', parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_URL}:${BUILD_VERSION}")]
       }
     }
 
