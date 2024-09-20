@@ -13,7 +13,7 @@ public class JWTSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/hello")
+                        .requestMatchers("/hello", "/actuator/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

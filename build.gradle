@@ -30,6 +30,9 @@ dependencies {
 	// Security
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
+	// Devops
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 	// DB Driver
 	runtimeOnly 'org.postgresql:postgresql'
 
