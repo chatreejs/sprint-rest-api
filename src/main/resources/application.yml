@@ -14,7 +14,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:${API_DB_URL}
+    url: jdbc:postgresql://${API_DB_HOST}:${API_DB_PORT}/${API_DB_NAME}
     username: ${API_DB_USER}
     password: ${API_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
