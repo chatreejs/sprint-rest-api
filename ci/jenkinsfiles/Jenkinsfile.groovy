@@ -78,7 +78,7 @@ pipeline {
 
     stage('Deploy to Kubernetes') {
       steps {
-        build job: 'chatreejs/GitOps/smarthome-api-manifest-dev', parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_URL}:${BUILD_VERSION}")]
+        build job: 'chatreejs/GitOps/smarthome-manifest-dev', parameters: [string(name: 'API_IMAGE_TAG', value: "${IMAGE_URL}:${BUILD_VERSION}")]
       }
     }
 
