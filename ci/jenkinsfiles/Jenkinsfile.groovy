@@ -39,7 +39,7 @@ pipeline {
         sh 'docker build -f Dockerfile . -t ${IMAGE_URL}:${BUILD_VERSION}'
       }
     }
-    
+
     stage('Push to registry') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'chatree-docker-registry-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -57,7 +57,7 @@ pipeline {
 
     stage('Deploy to Kubernetes') {
       steps {
-        build job: 'Chatree.js/Develop/GitOps/smarthome-manifest-dev', parameters: [string(name: 'API_IMAGE_TAG', value: "${BUILD_VERSION}")]
+        build job: "Chatree.js/GitOps/smarthome-manifest-${ENV}", parameters: [string(name: 'API_IMAGE_TAG', value: "${BUILD_VERSION}")]
       }
     }
 
