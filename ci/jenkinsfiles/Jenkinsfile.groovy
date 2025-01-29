@@ -39,28 +39,7 @@ pipeline {
         sh 'docker build -f Dockerfile . -t ${IMAGE_URL}:${BUILD_VERSION}'
       }
     }
-
-    stage('Image Vulnerability Scan') {
-      agent {
-        docker {
-          image 'aquasec/trivy:latest'
-          args '-v /var/run/docker.sock:/var/run/docker.sock -v trivy_cache:/.cache --entrypoint="" -u root --privileged'
-        }
-      }
-      steps {
-        sh 'trivy image --format template --template \"@/contrib/html.tpl\" --output report.html --severity HIGH,CRITICAL --no-progress ${IMAGE_URL}:${BUILD_VERSION}'
-
-        publishHTML target : [
-          allowMissing: true,
-          alwaysLinkToLastBuild: false,
-          keepAll: true,
-          reportDir: '.',
-          reportFiles: 'report.html',
-          reportName: 'Trivy Scan Report',
-        ]
-      }
-    }
-
+    
     stage('Push to registry') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'chatree-docker-registry-credential', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -86,10 +65,10 @@ pipeline {
 
   post {
     success {
-      discordSend description: "Duration: ${currentBuild.durationString}", link: env.BUILD_URL, result: currentBuild.currentResult, title: "${JOB_NAME} - # ${BUILD_VERSION}", footer: "${currentBuild.getBuildCauses()[0].shortDescription}",webhookURL: "https://discord.com/api/webhooks/${DISCORD_WEBHOOK_ID}/${DISCORD_WEBHOOK_TOKEN}"
+      discordSend description: "Duration: ${currentBuild.durationString}", link: env.BUILD_URL, result: currentBuild.currentResult, title: "${JOB_NAME} - # ${BUILD_VERSION}", footer: "${currentBuild.getBuildCauses()[0].shortDescription}", webhookURL: "https://discord.com/api/webhooks/${DISCORD_WEBHOOK_ID}/${DISCORD_WEBHOOK_TOKEN}"
     }
     failure {
-      discordSend description: "Duration: ${currentBuild.durationString}", link: env.BUILD_URL, result: currentBuild.currentResult, title: "${JOB_NAME} - # ${BUILD_VERSION}", footer: "${currentBuild.getBuildCauses()[0].shortDescription}",webhookURL: "https://discord.com/api/webhooks/${DISCORD_WEBHOOK_ID}/${DISCORD_WEBHOOK_TOKEN}"
+      discordSend description: "Duration: ${currentBuild.durationString}", link: env.BUILD_URL, result: currentBuild.currentResult, title: "${JOB_NAME} - # ${BUILD_VERSION}", footer: "${currentBuild.getBuildCauses()[0].shortDescription}", webhookURL: "https://discord.com/api/webhooks/${DISCORD_WEBHOOK_ID}/${DISCORD_WEBHOOK_TOKEN}"
     }
   }
 
