@@ -3,7 +3,6 @@ package dev.chatree.smarthomeapi.service;
 import dev.chatree.smarthomeapi.constant.ErrorMessage;
 import dev.chatree.smarthomeapi.entity.AccountEntity;
 import dev.chatree.smarthomeapi.entity.FoodEntity;
-import dev.chatree.smarthomeapi.entity.HomeEntity;
 import dev.chatree.smarthomeapi.model.food.FoodRequest;
 import dev.chatree.smarthomeapi.model.food.FoodResponse;
 import dev.chatree.smarthomeapi.model.food.FoodStatus;

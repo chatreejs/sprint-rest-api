@@ -7,20 +7,20 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Permission")
+@Table(name = "permission")
 public class PermissionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "HomeId")
+    @Column(name = "home_id")
     private long homeId;
 
-    @Column(name = "AccountId")
+    @Column(name = "account_id")
     private long accountId;
 
     @ElementCollection
-    @CollectionTable(name = "Permission", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "Permission")
+    @CollectionTable(name = "permission", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "permission")
     private Set<String> permissions;
 }

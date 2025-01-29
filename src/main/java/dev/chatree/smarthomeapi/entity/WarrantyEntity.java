@@ -8,41 +8,41 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "Warranty")
+@Table(name = "warranty")
 public class WarrantyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "Brand")
+    @Column(name = "brand")
     private String brand;
 
-    @Column(name = "ProductName")
+    @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "ProductNumber")
+    @Column(name = "product_number")
     private String productNumber;
 
-    @Column(name = "Model")
+    @Column(name = "model")
     private String model;
 
-    @Column(name = "SerialNumber")
+    @Column(name = "serial_number")
     private String serialNumber;
 
-    @Column(name = "PurchaseDate")
+    @Column(name = "purchase_date")
     private LocalDate purchaseDate;
 
-    @Column(name = "WarrantyDate")
+    @Column(name = "warranty_date")
     private LocalDate warrantyDate;
 
-    @Column(name = "CreateDate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
-    @Column(name = "UpdateDate")
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @ManyToOne
-    @JoinColumn(name = "HomeId")
+    @JoinColumn(name = "home_id")
     private HomeEntity home;
 
     @PrePersist

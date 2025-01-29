@@ -9,47 +9,47 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "Inventory")
+@Table(name = "inventory")
 public class InventoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "Name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "Brand")
+    @Column(name = "brand")
     private String brand;
 
-    @Column(name = "Quantity")
+    @Column(name = "quantity")
     private Double quantity;
 
-    @Column(name = "MaxQuantity")
+    @Column(name = "max_quantity")
     private Double maxQuantity;
 
-    @Column(name = "Unit")
+    @Column(name = "unit")
     private String unit;
 
-    @Column(name = "RestockDate")
+    @Column(name = "restock_date")
     private LocalDate restockDate;
 
     @ManyToOne
-    @JoinColumn(name = "CreateBy")
+    @JoinColumn(name = "create_by")
     private AccountEntity createBy;
 
     @ManyToOne
-    @JoinColumn(name = "UpdateBy")
+    @JoinColumn(name = "update_by")
     private AccountEntity updateBy;
 
     @CreationTimestamp
-    @Column(name = "CreateDate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @CreationTimestamp
-    @Column(name = "UpdateDate")
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @ManyToOne
-    @JoinColumn(name = "HomeId")
+    @JoinColumn(name = "home_id")
     private HomeEntity home;
 }

@@ -7,32 +7,32 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Account")
+@Table(name = "account")
 public class AccountEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "Subject")
+    @Column(name = "subject")
     private String subject;
 
-    @Column(name = "Username")
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "FirstName")
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
     @ManyToMany
     @JoinTable(
-            name = "Home_Account",
-            joinColumns = @JoinColumn(name = "AccountId"),
-            inverseJoinColumns = @JoinColumn(name = "HomeId")
+            name = "home_account",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "home_id")
     )
     private Set<HomeEntity> homes;
 }

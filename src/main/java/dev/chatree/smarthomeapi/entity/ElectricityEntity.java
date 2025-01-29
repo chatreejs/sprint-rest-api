@@ -9,47 +9,47 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "Electricity")
+@Table(name = "electricity")
 public class ElectricityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "InvoiceNumber")
+    @Column(name = "invoice_number")
     private String invoiceNumber;
 
-    @Column(name = "InvoiceDate")
+    @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
-    @Column(name = "Usage")
+    @Column(name = "usage")
     private Integer usage;
 
-    @Column(name = "FtRate")
+    @Column(name = "ft_rate")
     private BigDecimal ftRate;
 
-    @Column(name = "ElectricityPrice")
+    @Column(name = "electricity_price")
     private BigDecimal electricityPrice;
 
-    @Column(name = "ServiceCharge")
+    @Column(name = "service_charge")
     private BigDecimal serviceCharge;
 
-    @Column(name = "Ft")
+    @Column(name = "ft")
     private BigDecimal ft;
 
-    @Column(name = "Vat")
+    @Column(name = "vat")
     private BigDecimal vat;
 
-    @Column(name = "Total")
+    @Column(name = "total")
     private BigDecimal total;
 
-    @Column(name = "CreateDate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
-    @Column(name = "UpdateDate")
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @ManyToOne
-    @JoinColumn(name = "HomeId")
+    @JoinColumn(name = "home_id")
     private HomeEntity home;
 
     @PrePersist

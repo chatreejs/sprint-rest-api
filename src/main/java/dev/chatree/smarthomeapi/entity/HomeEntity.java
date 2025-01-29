@@ -10,25 +10,25 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "Home")
+@Table(name = "home")
 public class HomeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "Name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "Address")
+    @Column(name = "address")
     private String address;
 
-    @Column(name = "Latitude")
+    @Column(name = "latitude")
     private BigDecimal latitude;
 
-    @Column(name = "Longitude")
+    @Column(name = "longitude")
     private BigDecimal longitude;
 
-    @Column(name = "Owner")
+    @Column(name = "owner")
     private Long owner;
 
     @ManyToMany(mappedBy = "homes")
@@ -37,10 +37,10 @@ public class HomeEntity {
     @OneToMany(mappedBy = "home")
     private List<FoodEntity> foods;
 
-    @Column(name = "CreateDate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
-    @Column(name = "UpdateDate")
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @PrePersist
